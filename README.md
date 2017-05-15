@@ -19,7 +19,7 @@ A Polymer element for google recaptcha V2 and invisible.
   <google-recaptcha
     sitekey="YOUR_KEY"
     theme="dark"
-    type="video"
+    type="audio"
     size="compact"
     on-google-recaptcha-response="_handleRecaptchaResponse"
   ></google-recaptcha>
