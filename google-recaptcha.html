@@ -92,8 +92,7 @@
         expiredCallback: {
           type: Function,
           value: () => function() {
-            // should be undefined instead of null ?
-            this._setValue(null);
+            this._setValue('');
             this._setExpired(true);
             this.dispatchEvent(new CustomEvent(
               'google-recaptcha-expired',
@@ -110,7 +109,8 @@
         value: {
           type: String,
           readOnly: true,
-          notify: true
+          notify: true,
+          value: ''
         },
         type: {
           type: String,
@@ -221,6 +221,7 @@
 
       reset() {
         if (this.rendered) {
+          this._setValue('');
           grecaptcha.reset(this.widgetId);
         }
       },
