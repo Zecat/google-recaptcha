@@ -240,8 +240,7 @@
       },
 
       _getValidity() {
-        // TODO: add expire delay check ?
-        return !!lastRecaptchaToken;
+        return !!this.value;
       },
 
     });
