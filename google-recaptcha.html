@@ -22,6 +22,9 @@
 
 <dom-module id="google-recaptcha">
   <template>
+
+    <div id="container"></div>
+
   </template>
   <script>
 
@@ -178,7 +181,7 @@
 
       attached() {
         if (!this.container) {
-          this.container = this;
+          this.container = this.$.container;
         }
         window.addEventListener('grecaptcha-loaded', () => {
           this._setLoaded(true);
@@ -222,9 +225,9 @@
         }
       },
 
-      render(container = this.container) {
+      render() {
         if (!this.rendered && this.sitekey) {
-          this._setWidgetId(grecaptcha.render(this, {
+          this._setWidgetId(grecaptcha.render(this.container, {
             'sitekey': this.sitekey,
             'size': this._size,
             'tabindex': this.tabindex,
