@@ -1,5 +1,7 @@
 # \<google-recaptcha\>
 
+[Demo & Doc](http://zecat.github.io/google-recaptcha/)
+
 A Polymer element for google recaptcha V2 and invisible.
 
 ## Install
