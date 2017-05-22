@@ -4,9 +4,7 @@
 <link rel="import" href="../promise-polyfill/promise-polyfill-lite.html">
 
 <script>
-  window.grecaptchaLoaded = false;
   window.onloadGrecaptchaCallback = function() {
-    window.grecaptchaLoaded = true;
     this.dispatchEvent(new Event('grecaptcha-loaded'));
   }
 </script>
@@ -55,8 +53,7 @@
         loaded: {
           type: Boolean,
           readOnly: true,
-          // the function is useless here ?
-          value: () => window.grecaptchaLoaded,
+          value: () => !!window.grecaptcha,
           notify: true
         },
         widgetId: {
