@@ -1,0 +1,208 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../paper-styles/typography.html">
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+
+<!--
+`sandbox-configuration`
+
+
+@demo demo/static.html
+-->
+
+<dom-module id="sandbox-configuration">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #bindedProps {
+        @apply --layout-horizontal;
+      }
+      .vertical {
+        @apply --layout-vertical;
+      }
+      .subheader {
+        @apply --paper-font-subhead;
+      }
+    </style>
+
+    <paper-toggle-button checked="{{showPrivate}}">Show private</paper-toggle-button>
+    <!-- TODO: give the tooltips a better style using prism-hightlighter -->
+    <div id="bindedProps">
+
+      <template is="dom-if" if="[[configuration.Function.length]]">
+        <div class="vertical">
+          <div class="subheader">Functions</div>
+          <template
+            is="dom-repeat"
+            items="{{configuration.Function}}"
+            filter="[[filterFn]]"
+          >
+            <paper-item>
+            <span>[[item.name]]<paper-tooltip>[[item.desc]]</paper-tooltip></span>
+            <span>
+              (
+              <paper-icon-button icon="settings">
+              </paper-icon-button>
+              )
+              <paper-tooltip>
+                <template
+                  is="dom-repeat"
+                  items="[[item.params]]" as="param">
+                  [[param.desc]]<br>
+                  [[param.name]]<br>
+                  [[param.type]]
+                </template>
+              </paper-tooltip>
+            </span>
+            <!-- TODO: Use a dropdown to display the response -->
+            <paper-icon-button on-tap="_handleFunctionButtonTap" icon="send"></paper-icon-button>[[item.lastResponse]]
+          </paper-item>
+          </template>
+        </div>
+      </template>
+
+      <template is="dom-if" if="[[configuration.Boolean.length]]">
+        <div class="vertical">
+          <div class="subheader">Boolean properties</div>
+          <template
+            is="dom-repeat"
+            items="{{configuration.Boolean}}"
+            filter="[[filterFn]]"
+          >
+            <paper-item>
+              <paper-checkbox checked="{{item.value}}">[[_toHyphen(item.name)]]</paper-checkbox>
+              <paper-tooltip>[[item.desc]]</paper-tooltip>
+            </paper-item>
+          </template>
+        </div>
+      </template>
+
+      <template is="dom-if" if="[[configuration.String.length]]">
+        <div class="vertical">
+          <div class="subheader">String properties</div>
+          <template
+            is="dom-repeat"
+            items="{{configuration.String}}"
+            filter="[[filterFn]]"
+          >
+            <paper-item>
+            <paper-input label="[[_toHyphen(item.name)]]" value="{{item.value}}"></paper-input>
+            <paper-tooltip>[[item.desc]]</paper-tooltip>
+          </paper-item>
+          </template>
+        </div>
+      </template>
+
+      <template is="dom-if" if="[[configuration.Number.length]]">
+        <div class="vertical">
+          <div class="subheader">Number properties</div>
+          <template
+            is="dom-repeat"
+            items="{{configuration.Number}}"
+            filter="[[filterFn]]"
+          >
+            <paper-item>
+            <paper-input label="[[_toHyphen(item.name)]]" value="{{item.value}}"></paper-input>
+            <paper-tooltip>[[item.desc]]</paper-tooltip>
+          </paper-item>
+          </template>
+        </div>
+      </template>
+
+      <template is="dom-if" if="[[configuration.Event.length]]">
+        <div class="vertical">
+          <div class="subheader">Events</div>
+          <template
+            is="dom-repeat"
+            items="{{configuration.Event}}"
+          >
+            <paper-item>
+              [[item.name]]
+              <paper-tooltip>[[item.desc]]</paper-tooltip>
+            </paper-item>
+          </template>
+        </div>
+      </template>
+
+      <template is="dom-if" if="[[configuration.Event.length]]">
+        <div class="vertical">
+          <div class="subheader">Events fired</div>
+          <template
+            is="dom-repeat"
+            items="{{configuration.Fired}}"
+          >
+            <paper-item>
+              [[item.name]]
+              <paper-tooltip>[[item.detail]]</paper-tooltip>
+            </paper-item>
+          </template>
+        </div>
+      </template>
+
+      <template is="dom-if" if="[[configuration.Promise]]">
+        <div class="vertical">
+          <div class="subheader">Promise properties</div>
+            <template
+              is="dom-repeat"
+              items="{{configuration.Promise}}"
+              filter="[[filterFn]]"
+            >
+            <paper-item>
+              [[item.name]]
+              <paper-tooltip>[[item.desc]]</paper-tooltip>
+            </paper-item>
+          </template>
+        </div>
+      </template>
+  </div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'sandbox-configuration',
+
+      properties: {
+        showPrivate: {
+          type: Boolean,
+          value: false
+        },
+        filterFn: {
+          type: Function,
+          computed: '_computeFilterFn(showPrivate)'
+        },
+        element: {
+          type: Object
+        },
+        configuration: {
+          type: Object,
+          value: () => ({})
+        },
+      },
+
+      _toHyphen(value) {
+        return value.replace( /([A-Z])/g, "-$1" ).toLowerCase();
+      },
+
+      _computeFilterFn(showPrivate) {
+        return item => showPrivate || !item.private;
+      },
+
+      _handleFunctionButtonTap(e) {
+        let model = e.model;
+        model.set('item.lastResponse', this.element[model.item.name]());
+      },
+
+    });
+  </script>
+</dom-module>

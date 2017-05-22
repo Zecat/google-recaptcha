@@ -1,0 +1,247 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
+<link rel="import" href="../iron-validatable-behavior/iron-validatable-behavior.html">
+<link rel="import" href="../promise-polyfill/promise-polyfill-lite.html">
+
+<script>
+  window.onloadGrecaptchaCallback = function() {
+    this.dispatchEvent(new Event('grecaptcha-loaded'));
+  }
+</script>
+<!-- TODO: Add hl config in some way-->
+<script src="https://www.google.com/recaptcha/api.js?onload=onloadGrecaptchaCallback&render=explicit" async defer></script>
+
+<!--
+`google-recaptcha`
+
+@demo demo/index.html
+-->
+
+
+<dom-module id="google-recaptcha">
+  <template>
+
+    <div id="container"></div>
+
+  </template>
+  <script>
+
+
+    Polymer({
+
+      is: 'google-recaptcha',
+
+      behaviors: [
+        Polymer.IronFormElementBehavior,
+        Polymer.IronValidatableBehavior
+      ],
+
+      properties: {
+        invisible: {
+          type: Boolean,
+          value: false
+        },
+        preventAutoRender: {
+          type: Boolean,
+          value: false
+        },
+        rendered: {
+          type: Boolean,
+          computed: '_computeRendered(widgetId)',
+          notify: true
+        },
+        loaded: {
+          type: Boolean,
+          readOnly: true,
+          value: () => !!window.grecaptcha,
+          notify: true
+        },
+        widgetId: {
+          type: String,
+          readOnly: true,
+          notify: true
+        },
+        sitekey: {
+          type: String
+        },
+        /**
+         * Not working for now
+         */
+        loading: {
+          type: Boolean,
+          value: false
+        },
+        container: {
+          type: Object
+        },
+        responseCallback: {
+          type: Function,
+          value: () => function(token) {
+            this._setValue(token);
+            this._setExpired(false);
+            this.resolveCompletes(token);
+            this.dispatchEvent(new CustomEvent(
+              'google-recaptcha-response',
+              {detail: token, bubbles: true, composed: true}
+            ));
+          }
+        },
+        expiredCallback: {
+          type: Function,
+          value: () => function() {
+            this._setValue('');
+            this._setExpired(true);
+            this.dispatchEvent(new CustomEvent(
+              'google-recaptcha-expired',
+              {bubbles: true, composed: true}
+            ));
+          }
+        },
+        expired: {
+          type: Boolean,
+          value: false,
+          readOnly: true,
+          notify: true
+        },
+        value: {
+          type: String,
+          readOnly: true,
+          notify: true,
+          value: ''
+        },
+        type: {
+          type: String,
+          value: 'image'
+        },
+        /**
+         * Only for visible recaptcha { compact | normal }
+         */
+        size: {
+          type: String,
+          value: 'normal'
+        },
+        tabindex: {
+          type: Number,
+          value: 0
+        },
+        theme: {
+          type: String,
+          value: 'light'
+        },
+        /**
+         * {bottomright | bottomleft | inline}
+         * For invisible only.
+         * Reposition the reCAPTCHA badge. 'inline' allows you to control the CSS.
+         */
+        badge: {
+          type: String,
+          value: 'bottomright'
+        },
+        /**
+         * A promise that resolves when the grecaptcha response comes back.
+         *
+         * @type {Promise}
+         */
+        completes: {
+          type: Object,
+          readOnly: true,
+          notify: true,
+          value: function() {
+            return new Promise(function (resolve, reject) {
+              this.resolveCompletes = resolve;
+              this.rejectCompletes = reject;
+            }.bind(this));
+          }
+        },
+        _size: {
+          type: String,
+          computed: '_compute_size(size, invisible)'
+        }
+      },
+
+
+      /**
+       * Fired when a recaptcha response is recieved.
+       *
+       * @event google-recaptcha-response
+       */
+
+      /**
+       * Fired when a recaptcha expires.
+       *
+       * @event google-recaptcha-expired
+       */
+
+      observers: [
+        '_autoRenderIfNeeded(preventAutoRender, loaded, container, sitekey)'
+      ],
+
+      attached() {
+        if (!this.container) {
+          this.container = this.$.container;
+        }
+        window.addEventListener('grecaptcha-loaded', () => {
+          this._setLoaded(true);
+        });
+      },
+
+      detached() {
+        // TODO: remove event listener
+      },
+
+      _compute_size(size, invisible) {
+        return invisible ? 'invisible' : size;
+      },
+
+      _computeRendered(widgetId) {
+        return !isNaN(widgetId);
+      },
+
+      _autoRenderIfNeeded(preventAutoRender, loaded, container) {
+        if(!preventAutoRender && loaded && container) {
+          this.render();
+        }
+      },
+
+      getResponse() {
+        if (this.rendered) {
+          return grecaptcha.getResponse(this.widgetId);
+        }
+      },
+
+      execute() {
+        if (this.rendered && this.invisible) {
+          grecaptcha.execute(this.widgetId);
+          return this.completes;
+        }
+      },
+
+      reset() {
+        if (this.rendered) {
+          this._setValue('');
+          grecaptcha.reset(this.widgetId);
+        }
+      },
+
+      render() {
+        if (!this.rendered && this.sitekey) {
+          this._setWidgetId(grecaptcha.render(this.container, {
+            'sitekey': this.sitekey,
+            'size': this._size,
+            'tabindex': this.tabindex,
+            'callback': this.responseCallback.bind(this),
+            'expired-callback': this.expiredCallback.bind(this),
+            'theme': this.theme,
+            'badge': this.badge
+          }));
+        }
+      },
+
+      _getValidity() {
+        return !!this.value;
+      },
+
+    });
+
+  </script>
+</dom-module>

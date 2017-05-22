@@ -1,0 +1,110 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../hydrolysis/hydrolysis-analyzer.html">
+
+<!--
+`sandbox-analyzer`
+
+
+@demo demo/static.html
+-->
+
+<dom-module id="sandbox-analyzer">
+  <template>
+    <hydrolysis-analyzer id="analyzer" clean analyzer="{{_hydroDesc}}" loading="{{loading}}"></hydrolysis-analyzer>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'sandbox-analyzer',
+
+      properties: {
+        loading: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+        importPath: {
+          type: String
+        },
+        element: {
+          type: Object
+        },
+        _hydroDesc: {
+          type: Object,
+          value: () => ({})
+        },
+        configuration: {
+          type: Object,
+          computed: '_computeConfiguration(_hydroDesc, ignoredFunctions)',
+          notify: true
+        },
+        ignoredFunctions: {
+          type: Array,
+          value: () => ['attached', 'registered', 'ready' ,'detached']
+        },
+        elmentHref: {
+          type: String,
+        }
+      },
+
+      observers: [
+        '_elementHrefChanged(elementHref)',
+      ],
+
+      _elementHrefChanged(elementHref) {
+        this.$.analyzer.src = elementHref;
+        this.$.analyzer.analyze();
+      },
+
+      _computeConfiguration(_hydroDesc, ignoredFunctions) {
+        if (!_hydroDesc.elementsByTagName) {
+          return;
+        }
+        let elementsDescriptor = _hydroDesc.elementsByTagName;
+        let elementDescriptor = elementsDescriptor[this.element.is];
+        if(!elementDescriptor) {
+          return;
+        }
+        let configuration = {};
+        for (let property of elementDescriptor.properties) {
+          let name = property.name;
+          let firstChar = name[0];
+          let isPrivate = firstChar == '_';
+          let type = property.type;
+            // TODO: manage unknown type == ''
+            // TODO: manage private property
+          if (type && !(type === 'Function' && ignoredFunctions.includes(name))) {
+            let prop = {
+              name,
+              value: this.element ? this.element[name] : property.default[name],
+              private: isPrivate,
+              desc: property.desc,
+            }
+            if (type === 'Function') {
+              prop.params = property.params;
+              prop.lastResponse = undefined;
+            }
+            if (!configuration[type]) {
+              configuration[type] = [];
+            }
+            let lastIndex = configuration[type].push(prop) - 1;
+            // TODO: type Function should listen to event, unless there are defined as configuration
+            // Maybe there's a way to user linkPaths method for that job ?
+            // TODO: remove listener when needed
+          }
+        }
+        if (elementDescriptor.events) {
+          configuration.Event = [];
+        }
+        for (let event of elementDescriptor.events) {
+          configuration.Event.push({name: event.name, desc: event.desc});
+        }
+        return configuration;
+        // Polymer.dom(this.$.elements).appendChild(element);
+        // this.element = element;
+      }
+
+    });
+  </script>
+</dom-module>

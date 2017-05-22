@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>paper-sandbox dynamic demo</title>
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../../paper-spinner/paper-spinner.html">
+    <link rel="import" href="../../paper-input/paper-input.html">
+
+    <link rel="import" href="../paper-sandbox.html">
+
+    <style is="custom-style" include="demo-pages-shared-styles">
+    </style>
+  </head>
+  <body>
+    <paper-sandbox id="sandbox"></paper-sandbox>
+    <script>
+      document.addEventListener('WebComponentsReady', () => {
+        let sandbox = Polymer.dom(document.getElementById('sandbox'));
+        let paperInput = document.createElement('paper-input');
+        sandbox.appendChild(paperInput);
+        setTimeout(() => {
+          sandbox.removeChild(paperInput);
+          let paperSpinner = document.createElement('paper-spinner');
+          sandbox.appendChild(paperSpinner);
+        }, 10000)
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,116 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="sandbox-analyzer.html">
+<link rel="import" href="sandbox-configuration.html">
+
+<!--
+`paper-sandbox`
+
+
+@demo demo/static.html
+-->
+
+<dom-module id="paper-sandbox">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <sandbox-analyzer
+      configuration="{{configuration}}"
+      element-href="[[elementHref]]"
+      element="[[element]]"
+    ></sandbox-analyzer>
+
+    <slot></slot>
+
+    <sandbox-configuration
+      element="[[element]]"
+      configuration="{{configuration}}"
+      show-private="{{showPrivate}}"
+    ></sandbox-configuration>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'paper-sandbox',
+
+      properties: {
+        showPrivate: {
+          type: Boolean,
+          value: false
+        },
+        element: {
+          type: Object
+        },
+        configuration: {
+          type: Object
+        },
+        ignoredFunctions: {
+          type: Array,
+          value: () => ['attached', 'registered', 'ready' ,'detached']
+        },
+        elementHref: {
+          type: String,
+          notify: true,
+          value: ''
+        },
+      },
+
+      observers: [
+        '_updateElementAttribute(configuration.*, element)',
+        '_configurationChanged(configuration)',
+        '_updateHref(element, elementHref)',
+      ],
+
+      _updateHref(element, elementHref) {
+        if (!elementHref && element) {
+          this.elementHref = `${element.importPath}${element.is}.html`;
+        }
+      },
+
+      _updateElementAttribute(cr, element) {
+        var nameSubpath = cr.path.indexOf('.value');
+        if (nameSubpath >= 0) {
+          let type = cr.path.split('.')[1];
+          var itempath = cr.path.substring(0, nameSubpath);
+          var item = this.get(itempath);
+          var index = cr.base[type].indexOf(item);
+          element[item.name] = item.value;
+        }
+      },
+
+      _configurationChanged(configuration) {
+        for (let type in configuration) {
+          configuration[type].forEach((property, index) => {
+            if (type == 'Event') {
+              if (!configuration.Fired) {
+                this.set('configuration.Fired', []);
+              }
+              this.element.addEventListener(property.name, ev => {
+                this.unshift(`configuration.Fired`, {name: property.name, detail: JSON.stringify(ev.detail)});
+              });
+            } else {
+              let attribute = property.name.replace( /([A-Z])/g, "-$1" ).toLowerCase();
+              this.element.addEventListener(`${attribute}-changed`, ev => {
+                this.set(`configuration.${type}.${index}.value`, ev.detail.value);
+              });
+            }
+          });
+        }
+      },
+
+      attached() {
+        this._observer = Polymer.dom(this).observeNodes(this._onNodesChange);
+      },
+
+      _onNodesChange: function(info) {
+        this.element = Polymer.dom(this).children[0];
+      },
+
+    });
+  </script>
+</dom-module>
