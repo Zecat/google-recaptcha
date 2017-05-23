@@ -182,9 +182,7 @@
       ],
 
       attached() {
-        if (!this.container) {
-          this.container = this.$.container;
-        }
+        this.container = this.$.container;
         window.addEventListener('grecaptcha-loaded', () => {
           this._setLoaded(true);
         });
