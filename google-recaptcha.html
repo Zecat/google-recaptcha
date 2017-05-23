@@ -113,12 +113,9 @@
           type: String,
           value: 'image'
         },
-        /**
-         * Only for visible recaptcha { compact | normal }
-         */
-        size: {
-          type: String,
-          value: 'normal'
+        compact: {
+          type: Boolean,
+          value: false
         },
         tabindex: {
           type: Number,
@@ -155,7 +152,7 @@
         },
         _size: {
           type: String,
-          computed: '_compute_size(size, invisible)'
+          computed: '_compute_size(invisible, compact)'
         }
       },
 
@@ -189,8 +186,8 @@
         // TODO: remove event listener
       },
 
-      _compute_size(size, invisible) {
-        return invisible ? 'invisible' : size;
+      _compute_size(invisible, compact) {
+        return invisible ? 'invisible' : (compact ? 'compact' : 'normal');
       },
 
       _computeRendered(widgetId) {
