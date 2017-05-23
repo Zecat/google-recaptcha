@@ -109,9 +109,9 @@
           notify: true,
           value: ''
         },
-        type: {
-          type: String,
-          value: 'image'
+        audio: {
+          type: Boolean,
+          value: false
         },
         compact: {
           type: Boolean,
@@ -158,6 +158,10 @@
           type: String,
           computed: '_compute_theme(dark)'
         },
+        _type: {
+          type: String,
+          computed: '_compute_type(audio)'
+        },
       },
 
 
@@ -196,6 +200,10 @@
 
       _compute_theme(dark) {
         return dark ? 'dark' : 'light';
+      },
+
+      _compute_type(audio) {
+        return audio ? 'audio' : 'image';
       },
 
       _computeRendered(widgetId) {
@@ -237,6 +245,7 @@
             'callback': this.responseCallback.bind(this),
             'expired-callback': this.expiredCallback.bind(this),
             'theme': this._theme,
+            'type': this._type,
             'badge': this.badge
           }));
         }
