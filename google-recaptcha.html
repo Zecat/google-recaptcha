@@ -121,9 +121,9 @@
           type: Number,
           value: 0
         },
-        theme: {
-          type: String,
-          value: 'light'
+        dark: {
+          type: Boolean,
+          value: false
         },
         /**
          * {bottomright | bottomleft | inline}
@@ -153,7 +153,11 @@
         _size: {
           type: String,
           computed: '_compute_size(invisible, compact)'
-        }
+        },
+        _theme: {
+          type: String,
+          computed: '_compute_theme(dark)'
+        },
       },
 
 
@@ -188,6 +192,10 @@
 
       _compute_size(invisible, compact) {
         return invisible ? 'invisible' : (compact ? 'compact' : 'normal');
+      },
+
+      _compute_theme(dark) {
+        return dark ? 'dark' : 'light';
       },
 
       _computeRendered(widgetId) {
@@ -228,7 +236,7 @@
             'tabindex': this.tabindex,
             'callback': this.responseCallback.bind(this),
             'expired-callback': this.expiredCallback.bind(this),
-            'theme': this.theme,
+            'theme': this._theme,
             'badge': this.badge
           }));
         }
