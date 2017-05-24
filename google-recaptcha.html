@@ -53,8 +53,10 @@
         loaded: {
           type: Boolean,
           readOnly: true,
-          value: () => !!window.grecaptcha,
-          notify: true
+          notify: true,
+          value: function() {
+            return !!window.grecaptcha
+          }
         },
         widgetId: {
           type: String,
@@ -76,25 +78,29 @@
         },
         responseCallback: {
           type: Function,
-          value: () => function(token) {
-            this._setValue(token);
-            this._setExpired(false);
-            this.resolveCompletes(token);
-            this.dispatchEvent(new CustomEvent(
-              'google-recaptcha-response',
-              {detail: token, bubbles: true, composed: true}
-            ));
+          value: function() {
+            return function(token) {
+              this._setValue(token);
+              this._setExpired(false);
+              this.resolveCompletes(token);
+              this.dispatchEvent(new CustomEvent(
+                'google-recaptcha-response',
+                {detail: token, bubbles: true, composed: true}
+              ));
+            }.bind(this)
           }
         },
         expiredCallback: {
           type: Function,
-          value: () => function() {
-            this._setValue('');
-            this._setExpired(true);
-            this.dispatchEvent(new CustomEvent(
-              'google-recaptcha-expired',
-              {bubbles: true, composed: true}
-            ));
+          value: function() {
+            return function() {
+              this._setValue('');
+              this._setExpired(true);
+              this.dispatchEvent(new CustomEvent(
+                'google-recaptcha-expired',
+                {bubbles: true, composed: true}
+              ));
+            }.bind(this)
           }
         },
         expired: {
@@ -181,60 +187,60 @@
         '_autoRenderIfNeeded(preventAutoRender, loaded, container, sitekey)'
       ],
 
-      attached() {
+      attached: function() {
         this.container = this.$.container;
-        window.addEventListener('grecaptcha-loaded', () => {
+        window.addEventListener('grecaptcha-loaded', function() {
           this._setLoaded(true);
-        });
+        }.bind(this));
       },
 
-      detached() {
+      detached: function() {
         // TODO: remove event listener
       },
 
-      _compute_size(invisible, compact) {
+      _compute_size: function(invisible, compact) {
         return invisible ? 'invisible' : (compact ? 'compact' : 'normal');
       },
 
-      _compute_theme(dark) {
+      _compute_theme: function(dark) {
         return dark ? 'dark' : 'light';
       },
 
-      _compute_type(audio) {
+      _compute_type: function(audio) {
         return audio ? 'audio' : 'image';
       },
 
-      _computeRendered(widgetId) {
+      _computeRendered: function(widgetId) {
         return !isNaN(widgetId);
       },
 
-      _autoRenderIfNeeded(preventAutoRender, loaded, container) {
+      _autoRenderIfNeeded: function(preventAutoRender, loaded, container) {
         if(!preventAutoRender && loaded && container) {
           this.render();
         }
       },
 
-      getResponse() {
+      getResponse: function() {
         if (this.rendered) {
           return grecaptcha.getResponse(this.widgetId);
         }
       },
 
-      execute() {
+      execute: function() {
         if (this.rendered && this.invisible) {
           grecaptcha.execute(this.widgetId);
           return this.completes;
         }
       },
 
-      reset() {
+      reset: function() {
         if (this.rendered) {
           this._setValue('');
           grecaptcha.reset(this.widgetId);
         }
       },
 
-      render() {
+      render: function() {
         if (!this.rendered && this.sitekey) {
           this._setWidgetId(grecaptcha.render(this.container, {
             'sitekey': this.sitekey,
@@ -249,7 +255,7 @@
         }
       },
 
-      _getValidity() {
+      _getValidity: function() {
         return !!this.value;
       },
 
