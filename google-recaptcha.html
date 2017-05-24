@@ -222,13 +222,13 @@
 
       getResponse: function() {
         if (this.rendered) {
-          return grecaptcha.getResponse(this.widgetId);
+          return window.grecaptcha.getResponse(this.widgetId);
         }
       },
 
       execute: function() {
         if (this.rendered && this.invisible) {
-          grecaptcha.execute(this.widgetId);
+          window.grecaptcha.execute(this.widgetId);
           return this.completes;
         }
       },
@@ -236,13 +236,13 @@
       reset: function() {
         if (this.rendered) {
           this._setValue('');
-          grecaptcha.reset(this.widgetId);
+          window.grecaptcha.reset(this.widgetId);
         }
       },
 
       render: function() {
         if (!this.rendered && this.sitekey) {
-          this._setWidgetId(grecaptcha.render(this.container, {
+          this._setWidgetId(window.grecaptcha.render(this.container, {
             'sitekey': this.sitekey,
             'size': this._size,
             'tabindex': this.tabindex,
