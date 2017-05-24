@@ -5,7 +5,7 @@
     "Zecat"
   ],
   "description": "A Polymer element for google recaptcha V2 and invisible",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "homepage": "https://github.com/Zecat/google-recaptcha",
   "keywords": [
