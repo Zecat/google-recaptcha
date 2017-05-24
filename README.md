@@ -6,7 +6,7 @@ A Polymer element for google recaptcha V2 and invisible.
 
 ## Install
 ```
-  bower install -S polymer-google-recaptcha
+  bower install -S Zecat/google-recaptcha
 ```
 
 ## Examples
