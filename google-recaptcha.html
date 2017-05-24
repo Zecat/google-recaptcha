@@ -2,6 +2,7 @@
 <link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
 <link rel="import" href="../iron-validatable-behavior/iron-validatable-behavior.html">
 <link rel="import" href="../promise-polyfill/promise-polyfill-lite.html">
+<link rel="import" href="iron-scroll-fit.html">
 
 <script>
   window.onloadGrecaptchaCallback = function() {
@@ -19,9 +20,35 @@
 
 
 <dom-module id="google-recaptcha">
+  <style>
+    :host {
+      display: block;
+    }
+    :host([hidden]) {
+      display: none !important;
+    }
+    :host(:not([invisible])) {
+      width: 302px;
+      height: 78px;
+    }
+    :host([compact]) {
+      width: 164px;
+      height: 144px;
+    }
+    :host([invisible][badge="inline"]) {
+      width: 256px;
+      height: 60px;
+    }
+  </style>
   <template>
 
-    <div id="container"></div>
+    <iron-scroll-fit
+      id="container"
+      hidden$="[[hidden]]"
+      scroll-target="{{scrollTarget}}"
+      horizontal-align="left"
+      vertical-align="top"
+    ></iron-scroll-fit>
 
   </template>
   <script>
@@ -37,9 +64,52 @@
       ],
 
       properties: {
-        invisible: {
+        inBodyDisabled: {
           type: Boolean,
           value: false
+        },
+        fitOnScrollDisabled: {
+          type: Boolean,
+          value: false
+        },
+        /**
+        * Specifies the element that will handle the scroll event
+        * on the behalf of the current element. This is typically a reference to an element,
+        * but there are a few more posibilities:
+        *
+        * ### Elements id
+        *
+        *```html
+        * <div id="scrollable-element" style="overflow: auto;">
+        *  <google-recaptcha scroll-target="scrollable-element"></google-recaptcha>
+        * </div>
+        *```
+        * In this case, the `scrollTarget` will point to the outer div element.
+        *
+        * ### Document scrolling
+        *
+        * For document scrolling, you can use the reserved word `document`:
+        *
+        *```html
+        * <google-recaptcha scroll-target="document"></google-recaptcha>
+        *```
+        *
+        * ### Elements reference
+        *
+        *```js
+        * recaptcha.scrollTarget = document.querySelector('#scrollable-element');
+        *```
+        *
+        * @type {HTMLElement}
+        * @default document
+        */
+        scrollTarget: {
+          type: HTMLElement
+        },
+        invisible: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
         },
         preventAutoRender: {
           type: Boolean,
@@ -112,8 +182,7 @@
         value: {
           type: String,
           readOnly: true,
-          notify: true,
-          value: ''
+          notify: true
         },
         audio: {
           type: Boolean,
@@ -138,7 +207,8 @@
          */
         badge: {
           type: String,
-          value: 'bottomright'
+          value: 'bottomright',
+          reflectToAttribute: true
         },
         /**
          * A promise that resolves when the grecaptcha response comes back.
@@ -156,6 +226,17 @@
             }.bind(this));
           }
         },
+        inBody: {
+          type: Boolean,
+          value: false,
+          readOnly: true,
+          notify: true
+        },
+        hidden: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
         _size: {
           type: String,
           computed: '_compute_size(invisible, compact)'
@@ -170,7 +251,6 @@
         },
       },
 
-
       /**
        * Fired when a recaptcha response is recieved.
        *
@@ -184,11 +264,16 @@
        */
 
       observers: [
-        '_autoRenderIfNeeded(preventAutoRender, loaded, container, sitekey)'
+        '_autoRenderIfNeeded(preventAutoRender, loaded, container, sitekey)',
+        '_updateScrollListener(invisible, badge, fitOnScrollDisabled, container)',
+        '_updatePosition(inBodyDisabled, container)',
+        '_fitIfNeeded(inBody, fitOnScrollDisabled, hidden, container)',
       ],
 
       attached: function() {
-        this.container = this.$.container;
+        var container = this.$.container;
+        container.fitInto = this;
+        this.container = container;
         window.addEventListener('grecaptcha-loaded', function() {
           this._setLoaded(true);
         }.bind(this));
@@ -212,6 +297,27 @@
 
       _computeRendered: function(widgetId) {
         return !isNaN(widgetId);
+      },
+
+      _fitIfNeeded(inBody, fitOnScrollDisabled, hidden, container) {
+        if (inBody && !fitOnScrollDisabled && !hidden) {
+          container.fit();
+        }
+      },
+
+      _updateScrollListener(invisible, badge, fitOnScrollDisabled, container) {
+        container.toggleScrollListener(!fitOnScrollDisabled && !invisible || badge === 'inline');
+      },
+
+      _updatePosition(inBodyDisabled, container) {
+        if (!inBodyDisabled) {
+          !this.inBody && Polymer.dom(document.body).appendChild(container);
+          this._setInBody(true);
+        } else if (this.inBody){
+          Polymer.dom(this.root).appendChild(container);
+          container.resetFit();
+          this._setInBody(false);
+        }
       },
 
       _autoRenderIfNeeded: function(preventAutoRender, loaded, container) {

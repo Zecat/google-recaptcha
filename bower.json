@@ -23,7 +23,9 @@
     "polymer": "Polymer/polymer#1 - 2",
     "iron-form-element-behavior": "PolymerElements/iron-form-element-behavior#1 - 2",
     "iron-validatable-behavior": "PolymerElements/iron-validatable-behavior#1 - 2",
-    "promise-polyfill": "polymerlabs/promise-polyfill#^1.0.0"
+    "promise-polyfill": "polymerlabs/promise-polyfill#^1.0.0",
+    "iron-fit-behavior": "PolymerElements/iron-fit-behavior#^2.0.0",
+    "iron-scroll-target-behavior": "PolymerElements/iron-scroll-target-behavior#^2.0.0"
   },
   "devDependencies": {
     "paper-sandbox": "Zecat/paper-sandbox#0.0.4",
