@@ -23,10 +23,10 @@
     "polymer": "Polymer/polymer#^1.4.0",
     "iron-form-element-behavior": "^1.0.7",
     "iron-validatable-behavior": "^1.1.2",
-    "paper-sandbox": "^0.0.4",
     "promise-polyfill": "polymerlabs/promise-polyfill#^1.0.0"
   },
   "devDependencies": {
+    "paper-sandbox": "Zecat/paper-sandbox#^0.0.4",
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
     "web-component-tester": "^6.0.0-prerelease.5",
