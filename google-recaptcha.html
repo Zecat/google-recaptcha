@@ -353,7 +353,7 @@
        * @return {Boolean}         True if the element has a foreign ShadowRoot parent
        */
       _hasShadowParent: function(element) {
-        while(element.parentNode && (element = element.parentNode)) {
+        while(element && element.parentNode && (element = element.parentNode)) {
           if(element instanceof ShadowRoot) return true;
         }
         return false;
