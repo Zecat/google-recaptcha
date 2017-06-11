@@ -137,7 +137,7 @@
         /**
          * True when the recaptcha library is loaded.
          */
-        loaded: {
+        libraryLoaded: {
           type: Boolean,
           readOnly: true,
           notify: true,
@@ -340,7 +340,7 @@
        */
 
       observers: [
-        '_autoRenderIfNeeded(manualRender, loaded, container, sitekey)',
+        '_autoRenderIfNeeded(manualRender, libraryLoaded, container, sitekey)',
         '_updateScrollListener(invisible, badge, fitOnScrollDisabled, container)',
         '_updatePosition(inBodyDisabled, forceInBody, container)',
         '_fitIfNeeded(inBody, fitOnScrollDisabled, hidden, container, rendered)',
@@ -363,7 +363,7 @@
         container.fitInto = this;
         this.container = container;
         window.addEventListener('grecaptcha-loaded', function() {
-          this._setLoaded(true);
+          this._setLibraryLoaded(true);
         }.bind(this));
       },
 
@@ -415,8 +415,8 @@
         }
       },
 
-      _autoRenderIfNeeded: function(manualRender, loaded, container) {
-        if(!manualRender && loaded && container) {
+      _autoRenderIfNeeded: function(manualRender, libraryLoaded, container) {
+        if(!manualRender && libraryLoaded && container) {
           this.render();
         }
       },
