@@ -122,7 +122,7 @@
         /**
         * Prevents the recaptcha being automatically rendered on attach.
         */
-        preventAutoRender: {
+        manualRender: {
           type: Boolean,
           value: false
         },
@@ -340,7 +340,7 @@
        */
 
       observers: [
-        '_autoRenderIfNeeded(preventAutoRender, loaded, container, sitekey)',
+        '_autoRenderIfNeeded(manualRender, loaded, container, sitekey)',
         '_updateScrollListener(invisible, badge, fitOnScrollDisabled, container)',
         '_updatePosition(inBodyDisabled, forceInBody, container)',
         '_fitIfNeeded(inBody, fitOnScrollDisabled, hidden, container, rendered)',
@@ -415,8 +415,8 @@
         }
       },
 
-      _autoRenderIfNeeded: function(preventAutoRender, loaded, container) {
-        if(!preventAutoRender && loaded && container) {
+      _autoRenderIfNeeded: function(manualRender, loaded, container) {
+        if(!manualRender && loaded && container) {
           this.render();
         }
       },
