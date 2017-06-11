@@ -354,7 +354,7 @@
         '_autoRenderIfNeeded(manualRender, libraryLoaded, container, sitekey)',
         '_updateScrollListener(invisible, badge, fitOnScrollDisabled, container)',
         '_updatePosition(inBodyDisabled, forceInBody, container)',
-        '_fitIfNeeded(inBody, fitOnScrollDisabled, hidden, container, rendered)',
+        '_refitIfNeeded(inBody, fitOnScrollDisabled, hidden, container, rendered)',
         '_fetchLibrary(lang)'
       ],
 
@@ -415,9 +415,9 @@
         return !isNaN(widgetId);
       },
 
-      _fitIfNeeded(inBody, fitOnScrollDisabled, hidden, container) {
+      _refitIfNeeded(inBody, fitOnScrollDisabled, hidden, container) {
         if (container && inBody && !fitOnScrollDisabled && !hidden) {
-          container.fit();
+          container.refit();
         }
       },
 
