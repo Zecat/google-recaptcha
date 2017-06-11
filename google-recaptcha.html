@@ -5,7 +5,7 @@
 
 <script>
   window.onloadGrecaptchaCallback = function() {
-    this.dispatchEvent(new Event('grecaptcha-loaded'));
+    this.dispatchEvent(new Event('grecaptcha-loaded', {bubbles: true, composed: true}));
   }
 </script>
 
