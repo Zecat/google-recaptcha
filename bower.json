@@ -2,9 +2,9 @@
   "name": "google-recaptcha",
   "main": "google-recaptcha.html",
   "authors": [
-    "Zecat"
+    "Zecat <jullienfelix@gmail.com>"
   ],
-  "description": "A Polymer element for google recaptcha V2 and invisible",
+  "description": "Google recaptcha V2 and invisible (Polymer 1.9 - 2.x)",
   "version": "0.0.4",
   "license": "MIT",
   "homepage": "https://github.com/Zecat/google-recaptcha",
