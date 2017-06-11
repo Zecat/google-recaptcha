@@ -10,7 +10,7 @@
 </script>
 
 <!-- TODO: Add hl config in some way-->
-<script src="https://www.google.com/recaptcha/api.js?onload=onloadGrecaptchaCallback&render=explicit" async defer></script>
+<!-- <script src="https://www.google.com/recaptcha/api.js?onload=onloadGrecaptchaCallback&render=explicit" async defer></script> -->
 
 <!--
 `google-recaptcha`
@@ -346,6 +346,25 @@
         '_fitIfNeeded(inBody, fitOnScrollDisabled, hidden, container, rendered)',
       ],
 
+      _fetchApi: function () {
+        if (window.hasScript) return;
+        var script = document.createElement('script');
+        var apiUrl = 'https://www.google.com/recaptcha/api.js?onload=onloadGrecaptchaCallback&render=explicit'
+        // let's prevent loading the script if the browser is offline
+        script.setAttribute('async', '');
+        script.setAttribute('id', 'captcha');
+        script.setAttribute('defer', '');
+        script.setAttribute('src', apiUrl);
+        // if (!this.lang) {
+        //   script.setAttribute('src', this._API_URL);
+        // }
+        // else {
+        //   script.setAttribute('src', this._API_URL + '?hl=' + this.lang);
+        // }
+        document.head.appendChild(script);
+        window.hasScript = true;
+      },
+
       /**
        * Check if the element is in shadow DOM.
        * @param  {HTMLElement} element The element to check
@@ -365,6 +384,7 @@
         window.addEventListener('grecaptcha-loaded', function() {
           this._setLoaded(true);
         }.bind(this));
+        this._fetchApi();
       },
 
       detached: function() {
