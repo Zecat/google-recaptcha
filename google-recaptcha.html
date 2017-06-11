@@ -20,27 +20,27 @@
 
 
 <dom-module id="google-recaptcha">
-  <style>
-    :host {
-      display: block;
-    }
-    :host([hidden]) {
-      display: none !important;
-    }
-    :host(:not([invisible])) {
-      width: 302px;
-      height: 78px;
-    }
-    :host([compact]) {
-      width: 164px;
-      height: 144px;
-    }
-    :host([invisible][badge="inline"]) {
-      width: 256px;
-      height: 60px;
-    }
-  </style>
   <template>
+    <style>
+      :host {
+        display: block;
+      }
+      :host([hidden]) {
+        display: none !important;
+      }
+      :host(:not([invisible])) {
+        width: 302px;
+        height: 78px;
+      }
+      :host([compact]) {
+        width: 164px;
+        height: 144px;
+      }
+      :host([invisible][badge="inline"]) {
+        width: 256px;
+        height: 60px;
+      }
+    </style>
 
     <iron-scroll-fit
       id="container"
