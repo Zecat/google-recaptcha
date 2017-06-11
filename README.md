@@ -19,6 +19,7 @@ A Polymer element for google recaptcha V2 and invisible.
 <dom-bind>
   <template is="dom-bind">
     <google-recaptcha
+      force-in-body
       value="{{token}}"
       sitekey="6LdHISEUAAAAAN0FxtC5OBGQv-zrtj1tQ1Z_KUWf"
     ></google-recaptcha>
