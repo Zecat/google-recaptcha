@@ -6,11 +6,9 @@
 <script>
   window.onloadGrecaptchaCallback = function() {
     this.dispatchEvent(new Event('grecaptcha-loaded', {bubbles: true, composed: true}));
+    window.fetchingGrecaptchaLibrary = false;
   }
 </script>
-
-<!-- TODO: Add hl config in some way-->
-<script src="https://www.google.com/recaptcha/api.js?onload=onloadGrecaptchaCallback&render=explicit" async defer></script>
 
 <!--
 `google-recaptcha`
@@ -305,6 +303,19 @@
           reflectToAttribute: true
         },
         /**
+         * Forces the widget to render in a specific language. Auto-detects the
+         * user's language if unspecified.
+         * See https://developers.google.com/recaptcha/docs/language for
+         * available language code.
+         * For now, it is a one time configuration. The first recaptcha find
+         * defines the language for all others.
+         */
+        lang: {
+          type: String,
+          value: '',
+          notify: true
+        },
+        /**
          * The computed size recaptcha parameter.
          */
         _size: {
@@ -344,7 +355,24 @@
         '_updateScrollListener(invisible, badge, fitOnScrollDisabled, container)',
         '_updatePosition(inBodyDisabled, forceInBody, container)',
         '_fitIfNeeded(inBody, fitOnScrollDisabled, hidden, container, rendered)',
+        '_fetchLibrary(lang)'
       ],
+
+      _fetchLibrary: function(lang) {
+        if (window.fetchingGrecaptchaLibrary || window.grecaptcha) return;
+        var script = document.createElement('script');
+        var hl = !!lang ? '&hl=' + lang : '';
+        var apiUrl = 'https://www.google.com/recaptcha/api.js?onload=onloadGrecaptchaCallback&render=explicit' + hl;
+        script.setAttribute('async', '');
+        script.setAttribute('id', 'grecaptchaLibrary');
+        script.setAttribute('defer', '');
+        script.setAttribute('src', apiUrl);
+        script.onerror = function() {
+          window.fetchingGrecaptchaLibrary = false;
+        };
+        window.fetchingGrecaptchaLibrary = true;
+        document.head.appendChild(script);
+      },
 
       /**
        * Check if the element is in shadow DOM.
