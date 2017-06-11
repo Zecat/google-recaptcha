@@ -345,7 +345,7 @@
         '_autoRenderIfNeeded(preventAutoRender, loaded, container, sitekey)',
         '_updateScrollListener(invisible, badge, fitOnScrollDisabled, container)',
         '_updatePosition(inBodyDisabled, forceInBody, container)',
-        '_fitIfNeeded(inBody, fitOnScrollDisabled, hidden, container)',
+        '_fitIfNeeded(inBody, fitOnScrollDisabled, hidden, container, rendered)',
       ],
 
       /**
@@ -390,33 +390,30 @@
       },
 
       _fitIfNeeded(inBody, fitOnScrollDisabled, hidden, container) {
-        if (inBody && !fitOnScrollDisabled && !hidden) {
+        if (container && inBody && !fitOnScrollDisabled && !hidden) {
           container.fit();
         }
       },
 
       _updateScrollListener(invisible, badge, fitOnScrollDisabled, container) {
-        container.toggleScrollListener(!fitOnScrollDisabled && !invisible || badge === 'inline');
+        if (container) {
+          container.toggleScrollListener(!fitOnScrollDisabled && !invisible || badge === 'inline');
+        }
       },
 
-      moveInBody: function() {
-        Polymer.dom(document.body).appendChild(this.container);
-        this._setInBody(true);
-      },
-
-      removeFromBody() {
-        Polymer.dom(this.root).appendChild(this.container);
-        this.container.resetFit();
-        this._setInBody(false);
-      },
-
-      _updatePosition(inBodyDisabled, container) {
+      _updatePosition(inBodyDisabled, forceInBody, container, rendered) {
+        if (!container) return;
         if (!inBodyDisabled) {
-          if (!this.inBody && (this.forceInBody || this._hasShadowParent(this))) {
-            this.moveInBody();
+          if (!this.inBody && (forceInBody || this._hasShadowParent(this))) {
+            // Append to body
+            Polymer.dom(document.body).appendChild(container);
+            this._setInBody(true);
           }
         } else if (this.inBody) {
-          this.removeFormBody();
+          // Remove from body
+          Polymer.dom(this.root).appendChild(container);
+          container.resetFit();
+          this._setInBody(false);
         }
       },
 
