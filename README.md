@@ -6,7 +6,7 @@ A Polymer element for google recaptcha V2 and invisible.
 
 <!--
 ```
-<custom-element-demo>
+<custom-element-demo height="500">
 <template>
 <link rel="import" href="google-recaptcha.html">
 <link rel="import" href="../promise-polyfill/promise-polyfill-lite.html">
