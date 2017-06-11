@@ -8,20 +8,23 @@
 
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
-    <script>
-      window.Polymer = {
-        dom: 'shadow'
-      };
-    </script>
-
     <link rel="import" href="../../paper-sandbox/paper-sandbox.html">
     <link rel="import" href="../../promise-polyfill/promise-polyfill-lite.html">
-    <link rel="import" href="x-form.html">
+    <link rel="import" href="../google-recaptcha.html">
 
   </head>
   <body>
 
-    <x-form></x-form>
+    <!--
+      Please create your own sitekey at https://www.google.com/recaptcha/admin
+    -->
+
+    <paper-sandbox>
+      <google-recaptcha
+        sitekey="6LdHISEUAAAAAN0FxtC5OBGQv-zrtj1tQ1Z_KUWf"
+        prevent-auto-render
+      ></google-recaptcha>
+    </paper-sandbox>
 
   </body>
 </html>

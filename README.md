@@ -1,41 +1,47 @@
+[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/Zecat/paper-relative-integer-input)
+
 # \<google-recaptcha\>
 
-[Demo & Doc](http://zecat.github.io/google-recaptcha/)
-
 A Polymer element for google recaptcha V2 and invisible.
+
+<!--
+```
+<custom-element-demo>
+<template>
+<link rel="import" href="google-recaptcha.html">
+<link rel="import" href="../promise-polyfill/promise-polyfill-lite.html">
+<next-code-block></next-code-block>
+</template>
+</custom-element-demo>
+```
+-->
+```html
+<dom-bind>
+  <template is="dom-bind">
+    <google-recaptcha
+      value="{{token}}"
+      sitekey="6LdHISEUAAAAAN0FxtC5OBGQv-zrtj1tQ1Z_KUWf"
+    ></google-recaptcha>
+    <span>[[token]]</span>
+  </template>
+</dom-bind>
+```
 
 ## Install
 ```
   bower install -S Zecat/google-recaptcha
 ```
 
-## Examples
-```html
-  <google-recaptcha
-    sitekey="YOUR_KEY"
-    value="{{token}}"
-  ></google-recaptcha>
+## Notes
 
-  <google-recaptcha
-    sitekey="YOUR_KEY"
-    theme="dark"
-    type="audio"
-    size="compact"
-    on-google-recaptcha-response="_handleRecaptchaResponse"
-  ></google-recaptcha>
+- Promise polyfill is a dev dependency.
+- Visit [https://www.google.com/recaptcha/admin](https://www.google.com/recaptcha/admin) to get a sitekey.
 
-  <!-- Call the method `execute` on this element when you want a token -->
-  <google-recaptcha
-    sitekey="YOUR_KEY"
-    invisible
-    badge="inline"
-  ></google-recaptcha>
+## Shadow DOM work-around
 
-  <!-- Using prevent-auto-render, call the method `render` when you want to
-  display the recaptcha, then call `execute` to get a token -->
-  <google-recaptcha
-    sitekey="YOUR_KEY"
-    invisible
-    prevent-auto-render
-  ></google-recaptcha>
-```
+By-design, the google recaptcha doesn't work inside shadow dom, so we detect
+when it has a ShadowRoot parent and if so, the recaptcha is placed in a
+container light DOM, which sync its size and screen position with its original
+\<google-recaptcha\> parent, and the container is moved into the body.
+The container is refit every time the user scroll or the \<google-recaptcha\> is
+notified of resize. This is an expensive task but the only solution so far.

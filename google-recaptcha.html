@@ -1,6 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
 <link rel="import" href="../iron-validatable-behavior/iron-validatable-behavior.html">
+<link rel="import" href="iron-scroll-fit.html">
 
 <script>
   window.onloadGrecaptchaCallback = function() {
@@ -14,13 +15,40 @@
 `google-recaptcha`
 
 @demo demo/index.html
+@demo demo/sandbox.html
 -->
 
 
 <dom-module id="google-recaptcha">
+  <style>
+    :host {
+      display: block;
+    }
+    :host([hidden]) {
+      display: none !important;
+    }
+    :host(:not([invisible])) {
+      width: 302px;
+      height: 78px;
+    }
+    :host([compact]) {
+      width: 164px;
+      height: 144px;
+    }
+    :host([invisible][badge="inline"]) {
+      width: 256px;
+      height: 60px;
+    }
+  </style>
   <template>
 
-    <div id="container"></div>
+    <iron-scroll-fit
+      id="container"
+      hidden$="[[hidden]]"
+      scroll-target="{{scrollTarget}}"
+      horizontal-align="left"
+      vertical-align="top"
+    ></iron-scroll-fit>
 
   </template>
   <script>
@@ -36,19 +64,81 @@
       ],
 
       properties: {
-        invisible: {
+        /**
+         * Prevents the recaptcha being moved into the body.
+         */
+        inBodyDisabled: {
           type: Boolean,
           value: false
         },
+        /**
+         * Prevents the recaptcha being refitted every time the user scroll when
+         * the it is in body.
+         */
+        fitOnScrollDisabled: {
+          type: Boolean,
+          value: false
+        },
+        /**
+        * Specifies the element that will handle the scroll event
+        * on the behalf of the current element. This is typically a reference to an element,
+        * but there are a few more posibilities:
+        *
+        * ### Elements id
+        *
+        *```html
+        * <div id="scrollable-element" style="overflow: auto;">
+        *  <google-recaptcha scroll-target="scrollable-element"></google-recaptcha>
+        * </div>
+        *```
+        * In this case, the `scrollTarget` will point to the outer div element.
+        *
+        * ### Document scrolling
+        *
+        * For document scrolling, you can use the reserved word `document`:
+        *
+        *```html
+        * <google-recaptcha scroll-target="document"></google-recaptcha>
+        *```
+        *
+        * ### Elements reference
+        *
+        *```js
+        * recaptcha.scrollTarget = document.querySelector('#scrollable-element');
+        *```
+        *
+        * @type {HTMLElement}
+        * @default document
+        */
+        scrollTarget: {
+          type: HTMLElement
+        },
+        /**
+         * When true, an invisible recaptcha will be use instead of v2.
+         */
+        invisible: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+        /**
+        * Prevents the recaptcha being automatically rendered on attach.
+        */
         preventAutoRender: {
           type: Boolean,
           value: false
         },
+        /**
+        * True when the recaptcha is rendered.
+        */
         rendered: {
           type: Boolean,
           computed: '_computeRendered(widgetId)',
           notify: true
         },
+        /**
+         * True when the recaptcha library is loaded.
+         */
         loaded: {
           type: Boolean,
           readOnly: true,
@@ -57,11 +147,19 @@
             return !!window.grecaptcha
           }
         },
+        /**
+         * The unique generated id for this recaptcha, if it is rendered.
+         */
         widgetId: {
           type: String,
           readOnly: true,
           notify: true
         },
+        /**
+         * The google recaptcha api key. This value is required for the
+         * recaptcha to work. Visit https://www.google.com/recaptcha/admin to
+         * get a key and don't forget to configure the allowed domain.
+         */
         sitekey: {
           type: String
         },
@@ -72,9 +170,16 @@
           type: Boolean,
           value: false
         },
+        /**
+         * The recaptcha container.
+         */
         container: {
           type: HTMLElement
         },
+        /**
+         * The function called when the user submits a successful CAPTCHA
+         * response.
+         */
         responseCallback: {
           type: Function,
           value: function() {
@@ -89,6 +194,9 @@
             }.bind(this)
           }
         },
+        /**
+         * The function called when the recaptcha expires.
+         */
         expiredCallback: {
           type: Function,
           value: function() {
@@ -102,30 +210,48 @@
             }.bind(this)
           }
         },
+        /**
+         * True when the recaptcha has expired and the user needs to solve a
+         * new CAPTCHA.
+         */
         expired: {
           type: Boolean,
           value: false,
           readOnly: true,
           notify: true
         },
+        /**
+         * The validated recaptcha token.
+         */
         value: {
           type: String,
           readOnly: true,
-          notify: true,
-          value: ''
+          notify: true
         },
+        /**
+         * Use an audio CAPTCHA.
+         */
         audio: {
           type: Boolean,
           value: false
         },
+        /**
+         * Use a compact recaptcha. For v2 only.
+         */
         compact: {
           type: Boolean,
           value: false
         },
-        tabindex: {
+        /**
+         * The recaptcha tabindex
+         */
+        tabIndex: {
           type: Number,
           value: 0
         },
+        /**
+         * Use the recaptcha dark theme.
+         */
         dark: {
           type: Boolean,
           value: false
@@ -137,7 +263,8 @@
          */
         badge: {
           type: String,
-          value: 'bottomright'
+          value: 'bottomright',
+          reflectToAttribute: true
         },
         /**
          * A promise that resolves when the grecaptcha response comes back.
@@ -155,20 +282,52 @@
             }.bind(this));
           }
         },
+        /**
+         * True when the recaptcha has been moved in body
+         */
+        inBody: {
+          type: Boolean,
+          value: false,
+          readOnly: true,
+          notify: true
+        },
+        /**
+         * Force the recaptcha to be in body, event if it has no shadow root
+         */
+        forceInBody: {
+          type: Boolean,
+          value: false
+        },
+        /**
+         * Hide the recaptcha badge. Use this property on your own risk, it may be against google policy.
+         */
+        hidden: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+        /**
+         * The computed size recaptcha parameter.
+         */
         _size: {
           type: String,
           computed: '_compute_size(invisible, compact)'
         },
+        /**
+        * The computed theme recaptcha parameter.
+        */
         _theme: {
           type: String,
           computed: '_compute_theme(dark)'
         },
+        /**
+        * The computed type recaptcha parameter.
+        */
         _type: {
           type: String,
           computed: '_compute_type(audio)'
         },
       },
-
 
       /**
        * Fired when a recaptcha response is recieved.
@@ -183,11 +342,28 @@
        */
 
       observers: [
-        '_autoRenderIfNeeded(preventAutoRender, loaded, container, sitekey)'
+        '_autoRenderIfNeeded(preventAutoRender, loaded, container, sitekey)',
+        '_updateScrollListener(invisible, badge, fitOnScrollDisabled, container)',
+        '_updatePosition(inBodyDisabled, forceInBody, container)',
+        '_fitIfNeeded(inBody, fitOnScrollDisabled, hidden, container)',
       ],
 
+      /**
+       * Check if the element is in shadow DOM.
+       * @param  {HTMLElement} element The element to check
+       * @return {Boolean}         True if the element has a foreign ShadowRoot parent
+       */
+      _hasShadowParent: function(element) {
+        while(element.parentNode && (element = element.parentNode)) {
+          if(element instanceof ShadowRoot) return true;
+        }
+        return false;
+      },
+
       attached: function() {
-        this.container = this.$.container;
+        var container = this.$.container;
+        container.fitInto = this;
+        this.container = container;
         window.addEventListener('grecaptcha-loaded', function() {
           this._setLoaded(true);
         }.bind(this));
@@ -213,18 +389,59 @@
         return !isNaN(widgetId);
       },
 
+      _fitIfNeeded(inBody, fitOnScrollDisabled, hidden, container) {
+        if (inBody && !fitOnScrollDisabled && !hidden) {
+          container.fit();
+        }
+      },
+
+      _updateScrollListener(invisible, badge, fitOnScrollDisabled, container) {
+        container.toggleScrollListener(!fitOnScrollDisabled && !invisible || badge === 'inline');
+      },
+
+      moveInBody: function() {
+        Polymer.dom(document.body).appendChild(this.container);
+        this._setInBody(true);
+      },
+
+      removeFromBody() {
+        Polymer.dom(this.root).appendChild(this.container);
+        this.container.resetFit();
+        this._setInBody(false);
+      },
+
+      _updatePosition(inBodyDisabled, container) {
+        if (!inBodyDisabled) {
+          if (!this.inBody && (this.forceInBody || this._hasShadowParent(this))) {
+            this.moveInBody();
+          }
+        } else if (this.inBody) {
+          this.removeFormBody();
+        }
+      },
+
       _autoRenderIfNeeded: function(preventAutoRender, loaded, container) {
         if(!preventAutoRender && loaded && container) {
           this.render();
         }
       },
 
+      /**
+       * Get the recaptcha response. You can also use `value` property which
+       * contains the response when there is one.
+       */
       getResponse: function() {
         if (this.rendered) {
           return window.grecaptcha.getResponse(this.widgetId);
         }
       },
 
+      /**
+       * Execute the recaptcha - invisible only. This is required before calling
+       * the render method.
+       * @return {Promise} A Promise that resolves when the recaptcha is ready
+       *                   to be rendered.
+       */
       execute: function() {
         if (this.rendered && this.invisible) {
           window.grecaptcha.execute(this.widgetId);
@@ -239,12 +456,16 @@
         }
       },
 
+      /**
+       * Render the recaptcha. For invisible version, you first need to call
+       * `execute` method.
+       */
       render: function() {
         if (!this.rendered && this.sitekey) {
           this._setWidgetId(window.grecaptcha.render(this.container, {
             'sitekey': this.sitekey,
             'size': this._size,
-            'tabindex': this.tabindex,
+            'tabindex': this.tabIndex,
             'callback': this.responseCallback.bind(this),
             'expired-callback': this.expiredCallback.bind(this),
             'theme': this._theme,
