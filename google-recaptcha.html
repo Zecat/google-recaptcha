@@ -246,6 +246,13 @@
           value: 0
         },
         /**
+         * The recaptcha container z-index when it is in body. Set to `null` to
+         * remove the z-index property.
+         */
+        inBodyZIndex: {
+          type: Number
+        },
+        /**
          * Use the recaptcha dark theme.
          */
         dark: {
@@ -355,8 +362,17 @@
         '_updateScrollListener(invisible, badge, fitOnScrollDisabled, container)',
         '_updatePosition(inBodyDisabled, forceInBody, container)',
         '_refitIfNeeded(inBody, fitOnScrollDisabled, hidden, container, rendered)',
+        '_updateContainerZIndex(inBody, inBodyZIndex, container)',
         '_fetchLibrary(lang)'
       ],
+
+      _updateContainerZIndex: function(inBody, inBodyZIndex, container) {
+        if (!(inBody == undefined || inBodyZIndex == undefined || container == undefined)) {
+          container.style.zIndex =
+            inBodyZIndex == null || isNaN(inBodyZIndex) || !inBody ?
+            null : inBodyZIndex;
+        }
+      },
 
       _fetchLibrary: function(lang) {
         if (window.fetchingGrecaptchaLibrary || window.grecaptcha) return;
