@@ -40,7 +40,7 @@
     </style>
 
     <iron-scroll-fit
-      id="container"
+      class="recaptcha-container"
       hidden$="[[hidden]]"
       scroll-target="{{scrollTarget}}"
       horizontal-align="left"
@@ -403,7 +403,7 @@
       },
 
       attached: function() {
-        var container = this.$.container;
+        var container = this.$$('.recaptcha-container');
         container.fitInto = this;
         this.container = container;
         window.addEventListener('grecaptcha-loaded', function() {
