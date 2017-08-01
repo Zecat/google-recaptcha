@@ -5,7 +5,7 @@
     "Zecat <jullienfelix@gmail.com>"
   ],
   "description": "Google recaptcha V2 and invisible (Polymer 1.9 - 2.x)",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "license": "MIT",
   "homepage": "https://github.com/Zecat/google-recaptcha",
   "keywords": [
