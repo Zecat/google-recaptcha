@@ -491,6 +491,10 @@
       reset: function() {
         if (this.rendered) {
           this._setValue('');
+          this._setCompletes(new Promise(function (resolve, reject) {
+            this.resolveCompletes = resolve;
+            this.rejectCompletes = reject;
+          }.bind(this)));
           window.grecaptcha.reset(this.widgetId);
         }
       },
